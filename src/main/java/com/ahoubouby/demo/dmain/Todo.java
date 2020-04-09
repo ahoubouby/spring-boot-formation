@@ -17,13 +17,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class Todo {
 
-    @NotNull
     @Id
     @GeneratedValue(generator = "system-uuid")
     @GenericGenerator(name = "system-uuid", strategy = "uuid")
     String id;
     @NotNull
     @NotBlank
+    @Column(name="description")
     String desc;
     boolean completed;
     @Column(insertable = true, updatable = false)
