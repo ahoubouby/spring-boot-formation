@@ -2,6 +2,7 @@ package com.ahoubouby.demo.apis;
 
 import com.ahoubouby.demo.dmain.Todo;
 import com.ahoubouby.demo.repos.CommonRepository;
+import com.ahoubouby.demo.repos.ToDoRepository;
 import com.ahoubouby.demo.validations.ToDoValidationError;
 import com.ahoubouby.demo.validations.ToDoValidationErrorBuilder;
 import org.springframework.http.HttpStatus;
@@ -12,14 +13,15 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
 public class TodoController {
 
-    private CommonRepository<String, Todo> repository;
+    private ToDoRepository repository;
 
-    public TodoController(CommonRepository<String, Todo> repository) {
+    public TodoController(ToDoRepository repository) {
         this.repository = repository;
     }
 
@@ -30,12 +32,17 @@ public class TodoController {
 
     @GetMapping("/todo/{id}")
     public ResponseEntity<Todo> getToDoById(@PathVariable String id) {
-        return ResponseEntity.ok(repository.findById(id));
+        Optional<Todo> toDo = repository.findById(id);
+        return toDo.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+
     }
 
     @PatchMapping("/todo/{id}")
     public ResponseEntity<Todo> setCompleted(@PathVariable String id) {
-        Todo result = repository.findById(id);
+        Optional<Todo> toDo = repository.findById(id);
+        if (!toDo.isPresent())
+            return ResponseEntity.notFound().build();
+        Todo result = toDo.get();
         result.setCompleted(true);
         repository.save(result);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -59,7 +66,8 @@ public class TodoController {
 
     @DeleteMapping("/todo/{id}")
     public ResponseEntity<Todo> deleteToDo(@PathVariable String id) {
-        Todo todo = Todo.builder().id(id).build();
+        Todo todo = new Todo();
+        todo.setId(id);
         repository.delete(todo);
         return ResponseEntity.noContent().build();
     }

@@ -10,8 +10,8 @@ public class DemoApplication {
 
     public static void main(String[] args) {
         new SpringApplicationBuilder(DemoApplication.class)
-                .bannerMode(Banner.Mode.OFF)
-                .logStartupInfo(false)
+//                .bannerMode(Banner.Mode.OFF)
+                .logStartupInfo(true)
                 .run(args);
     }
 
