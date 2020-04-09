@@ -59,8 +59,7 @@ public class TodoController {
 
     @DeleteMapping("/todo/{id}")
     public ResponseEntity<Todo> deleteToDo(@PathVariable String id) {
-        Todo todo = new Todo();
-        todo.setId(id);
+        Todo todo = Todo.builder().id(id).build();
         repository.delete(todo);
         return ResponseEntity.noContent().build();
     }
